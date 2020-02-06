@@ -14,33 +14,49 @@ def create_parser():
     return parser
 
 
-def parse_config(path):
-    config = configparser.ConfigParser()
-    config.read_file(codecs.open(path, 'r', 'utf8'))
-    return config
+def convert(abookpath, csvpath):
+    header = ('Title', 'First Name', 'Middle Name', 'Last Name', 'Nick Name', 'Display Name', 'Company', 'Department', 'Job Title', 'Office Location', 'E-mail Address', 'Notes', 'Web Page', 'Birthday', 'Other Email', 'Other Phone', 'Other Mobile', 'Mobile Phone',
+              'Home Email', 'Home Phone', 'Home Fax', 'Home Street', 'Home City', 'Home State', 'Home Postal Code', 'Home Country', 'Business Email', 'Business Phone', 'Business Fax', 'Business Street', 'Business City', 'Business State', 'Business Postal Code', 'Business Country')
 
-
-def convert(columns, abookpath, csvpath):
     csvfile = open(csvpath, 'w', newline='', encoding='utf-8')
     writer = csv.writer(csvfile)
-    writer.writerow(columns)
+    writer.writerow(header)
 
     with open(abookpath, 'r', encoding='utf-8') as abook:
         for line in abook:
-            params = line.split("|")
+            abookrow = line.split("|")
             if line == '':
                 continue
-            if len(params) != len(columns):
-                raise Exception(
-                    'Number of columns in columns.ini and in .abook file must be equal')
             else:
                 i = 0
-                while i < len(params):
-                    params[i] = params[i].replace('\n', '').replace('\r', '')
+                while i < len(abookrow):
+                    abookrow[i] = abookrow[i].replace(
+                        '\n', '').replace('\r', '')
                     i += 1
 
-                writer = csv.writer(csvfile)
-                writer.writerow(params)
+                print(len(header))
+                csvrow = []
+                i = 0
+                while i < len(header):
+                    print(header[i])
+                    if header[i] == 'First Name':
+                        print('fname')
+                        csvrow.append(abookrow[1])
+                    elif header[i] == 'Last Name':
+                        print('lname')
+                        csvrow.append(abookrow[2])
+                    elif header[i] == 'Display Name':
+                        print('dname')
+                        csvrow.append(abookrow[1]+' ' + abookrow[2])
+                        print('email')
+                    elif header[i] == 'E-mail Address' or header[i] == 'Home Email':
+                        csvrow.append(abookrow[3])
+                    else:
+                        print('empty')
+                        csvrow.append('')
+                    i += 1
+
+                writer.writerow(csvrow)
 
     csvfile.close()
 
@@ -49,19 +65,12 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
 
-    confpath = 'columns.ini'
-    config = parse_config(confpath)
-    columns_pairs = config.items('Columns')
-    columns = []
-    for num, name in columns_pairs:
-        columns.append(name)
-
     abookpath = args.file
     csvpath = args.csv
     if csvpath == None:
         csvpath = args.file.replace('.abook', '')+'.csv'
 
     try:
-        convert(columns, abookpath, csvpath)
+        convert(abookpath, csvpath)
     except:
         print("Cannot convert")
