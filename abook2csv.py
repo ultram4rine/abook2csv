@@ -42,6 +42,8 @@ def convert(columns, abookpath, csvpath):
                 writer = csv.writer(csvfile)
                 writer.writerow(params)
 
+    csvfile.close()
+
 
 if __name__ == '__main__':
     parser = create_parser()
