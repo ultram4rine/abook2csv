@@ -54,11 +54,12 @@ if __name__ == '__main__':
     for num, name in columns_pairs:
         columns.append(name)
 
+    abookpath = args.file
     csvpath = args.csv
     if csvpath == None:
         csvpath = args.file.replace('.abook', '')+'.csv'
 
-    # try:
-    convert(columns, args.file, csvpath)
-    # except:
-    #print("Преобразование прошло неудачно")
+    try:
+        convert(columns, abookpath, csvpath)
+    except:
+        print("Cannot convert")
