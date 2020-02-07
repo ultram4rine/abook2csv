@@ -2,14 +2,19 @@ import argparse
 import codecs
 import configparser
 import csv
+import os
+import sys
 
 
 def create_parser():
     parser = argparse.ArgumentParser(description='Convert .abook to .csv')
 
-    parser.add_argument('file', type=str, help='.abook file to convert')
+    parser.add_argument('-f', '--file', nargs='?', type=str,
+                        help='.abook file to convert')
     parser.add_argument('-c', '--csv', nargs='?', type=str,
                         help='.csv out file, if not set .abook file name will be used')
+    parser.add_argument('-d', '--dir', nargs='?', type=str,
+                        help='convert all .abook files in directory')
 
     return parser
 
@@ -63,20 +68,34 @@ def convert(abookpath, csvpath):
                 print('{} contact done\n'.format(j))
 
     csvfile.close()
+    print('{0} file done, output in {1}\n'.format(abookpath, csvpath))
 
 
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
 
-    abookpath = args.file
-    csvpath = args.csv
-    if csvpath == None:
-        csvpath = args.file.replace('.abook', '')+'.csv'
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
-    try:
-        convert(abookpath, csvpath)
-    except:
-        print('Cannot convert')
-    finally:
-        print('{0} file done, output in {1}'.format(abookpath, csvpath))
+    if args.dir != None:
+        directory = args.dir
+        for filename in os.listdir(directory):
+            if filename.endswith(".abook"):
+                abookpath = directory+'/'+filename
+                csvpath = abookpath.replace('.abook', '.csv')
+                try:
+                    convert(abookpath, csvpath)
+                except:
+                    print('Cannot convert {}'.format(abookpath))
+    elif args.file != None:
+        abookpath = args.file
+        csvpath = args.csv
+        if csvpath == None:
+            csvpath = abookpath.replace('.abook', '.csv')
+
+        try:
+            convert(abookpath, csvpath)
+        except:
+            print('Cannot convert {}'.format(abookpath))
