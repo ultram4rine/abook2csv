@@ -28,6 +28,9 @@ def convert(abookpath, csvpath):
     writer.writerow(header)
 
     with open(abookpath, 'r', encoding='utf-8') as abook:
+        if os.stat(abookpath).st_size == 0:
+            print('{} is empty, csv not created'.format(abookpath))
+            return
         j = 0
         for line in abook:
             abookrow = line.split("|")
