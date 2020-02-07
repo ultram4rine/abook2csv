@@ -23,6 +23,7 @@ def convert(abookpath, csvpath):
     writer.writerow(header)
 
     with open(abookpath, 'r', encoding='utf-8') as abook:
+        j = 0
         for line in abook:
             abookrow = line.split("|")
             if line == '':
@@ -34,29 +35,32 @@ def convert(abookpath, csvpath):
                         '\n', '').replace('\r', '')
                     i += 1
 
-                print(len(header))
                 csvrow = []
                 i = 0
                 while i < len(header):
-                    print(header[i])
-                    if header[i] == 'First Name':
-                        print('fname')
+                    if header[i] == 'Title':
+                        print('Set title: {}'.format(abookrow[0]))
+                        csvrow.append(abookrow[0])
+                    elif header[i] == 'First Name':
+                        print('Set first name: {}'.format(abookrow[1]))
                         csvrow.append(abookrow[1])
                     elif header[i] == 'Last Name':
-                        print('lname')
+                        print('Set last name: {}'.format(abookrow[2]))
                         csvrow.append(abookrow[2])
                     elif header[i] == 'Display Name':
-                        print('dname')
+                        print('Set display name: {}'.format(
+                            abookrow[1]+' ' + abookrow[2]))
                         csvrow.append(abookrow[1]+' ' + abookrow[2])
-                        print('email')
-                    elif header[i] == 'E-mail Address' or header[i] == 'Home Email':
+                    elif header[i] == 'E-mail Address':
+                        print('Set e-mail: {}'.format(abookrow[3]))
                         csvrow.append(abookrow[3])
                     else:
-                        print('empty')
                         csvrow.append('')
                     i += 1
 
                 writer.writerow(csvrow)
+                j += 1
+                print('{} contact done\n'.format(j))
 
     csvfile.close()
 
@@ -73,4 +77,6 @@ if __name__ == '__main__':
     try:
         convert(abookpath, csvpath)
     except:
-        print("Cannot convert")
+        print('Cannot convert')
+    finally:
+        print('{0} file done, output in {1}'.format(abookpath, csvpath))
